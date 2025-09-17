@@ -1,12 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mornibest</title>
-  </head>
-  <body>
-    <h1>Hello Mornibest!</h1>
-    <p>Hello World!!</p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morni best</title>
+    <style>
+        /* CSS: ページ全体のスタイルを設定 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f0f0; /* 背景色を少しだけつける */
+        }
+
+        body {
+            display: flex;
+            justify-content: center; /* 水平方向中央揃え */
+            align-items: center;    /* 垂直方向中央揃え */
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 2.5rem; /* remはルート要素のフォントサイズを基準とする単位 */
+            font-weight: 300; /* 少し細めのフォント */
+            color: #333;
+            margin-bottom: 0.5em; /* emは親要素のフォントサイズを基準とする単位 */
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 2em;
+        }
+
+        .button-wrapper {
+            display: flex;
+            justify-content: center; /* ボタンを中央に配置 */
+            gap: 20px; /* ボタン間のスペース */
+        }
+
+        .mode-button {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #333;
+            background-color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s; /* アニメーション効果 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* マウスが乗った時やタッチされた時のスタイル */
+        .mode-button:hover, .mode-button:active {
+            background-color: #e9e9e9;
+            transform: scale(1.05); /* 少しだけ拡大 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Morni best</h1>
+        <p>どっちのモードですごす？</p>
+        <div class="button-wrapper">
+            <button id="dara-dara-btn" class="mode-button">ダラダラ<br>モード</button>
+            <button id="saku-saku-btn" class="mode-button">サクサク<br>モード</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript: ボタンがクリックされた時の動作を定義
+        const daraDaraButton = document.getElementById('dara-dara-btn');
+        const sakuSakuButton = document.getElementById('saku-saku-btn');
+
+        daraDaraButton.addEventListener('click', () => {
+            alert('ダラダラモードが選択されました！');
+            // ここにダラダラモード用の処理を追加できます
+            console.log('dara-dara mode selected');
+        });
+
+        sakuSakuButton.addEventListener('click', () => {
+            alert('サクサクモードが選択されました！');
+            // ここにサクサクモード用の処理を追加できます
+            console.log('saku-saku mode selected');
+        });
+    </script>
+
+</body>
 </html>
