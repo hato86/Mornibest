@@ -1,12 +1,179 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mornibest</title>
-  </head>
-  <body>
-    <h1>Hello Mornibest!</h1>
-    <p>Hello World!!</p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morni best</title>
+    <style>
+        /* CSS: ページ全体のスタイルを設定 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f0f0;
+            overflow: hidden; /* スクロールバーが出ないようにする */
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column; /* 要素を縦に並べる */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box; /* paddingやborderをwidthに含める */
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #333;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 2em;
+        }
+
+        .button-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .mode-button {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #333;
+            background-color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 少し影をつける */
+        }
+
+        .mode-button:hover, .mode-button:active {
+            background-color: #e9e9e9;
+            transform: scale(1.05);
+        }
+
+        /* メッセージ表示エリアのスタイル */
+        .message-section {
+            position: absolute; /* 親要素（body）を基準に配置 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.95); /* 半透明の白背景 */
+            font-size: 3rem;
+            font-weight: bold;
+            color: #333;
+            opacity: 0; /* 初期状態では非表示 */
+            visibility: hidden; /* 初期状態では非表示 */
+            transition: opacity 0.5s ease-out; /* フェードインアニメーション用 */
+            z-index: 100; /* 他の要素より手前に表示 */
+        }
+
+        .message-section.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ダラダラモードのアニメーション */
+        .message-section.dara-dara-active {
+            animation: blur-in 1.5s forwards; /* ぼんやりフェードイン */
+        }
+
+        @keyframes blur-in {
+            0% { opacity: 0; filter: blur(10px); transform: scale(0.9); }
+            100% { opacity: 1; filter: blur(0); transform: scale(1); }
+        }
+
+        /* サクサクモードのアニメーション */
+        .message-section.saku-saku-active {
+            animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* シュパッとスライドイン */
+        }
+
+        @keyframes slide-in-right {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Morni best</h1>
+        <p>どっちのモードですごす？</p>
+        <div class="button-wrapper">
+            <button id="dara-dara-btn" class="mode-button">ダラダラ<br>モード</button>
+            <button id="saku-saku-btn" class="mode-button">サクサク<br>モード</button>
+        </div>
+    </div>
+
+    <div id="messageSection" class="message-section">
+        <span id="messageText"></span>
+    </div>
+
+    <script>
+        // JavaScript: ボタンがクリックされた時の動作を定義
+        const daraDaraButton = document.getElementById('dara-dara-btn');
+        const sakuSakuButton = document.getElementById('saku-saku-btn');
+        const messageSection = document.getElementById('messageSection');
+        const messageText = document.getElementById('messageText');
+
+        daraDaraButton.addEventListener('click', () => {
+            showMessage('ごゆっくりどうぞ〜', 'dara-dara');
+        });
+
+        sakuSakuButton.addEventListener('click', () => {
+            showMessage('頑張ろう！', 'saku-saku');
+        });
+
+        function showMessage(text, mode) {
+            // 既存のアニメーションクラスをクリア
+            messageSection.classList.remove('dara-dara-active', 'saku-saku-active');
+
+            // メッセージを設定
+            messageText.textContent = text;
+
+            // メッセージセクションを表示するためのクラスを追加
+            messageSection.classList.add('active');
+
+            // モードに応じたアニメーションクラスを追加
+            if (mode === 'dara-dara') {
+                messageSection.classList.add('dara-dara-active');
+            } else if (mode === 'saku-saku') {
+                messageSection.classList.add('saku-saku-active');
+            }
+
+            // オプション: 数秒後にメッセージを非表示に戻す
+            setTimeout(() => {
+                messageSection.classList.remove('active', 'dara-dara-active', 'saku-saku-active');
+            }, 3000); // 3秒後に非表示
+        }
+
+        // メッセージセクションをクリックすると非表示に戻るようにする (追加機能)
+        messageSection.addEventListener('click', () => {
+            messageSection.classList.remove('active', 'dara-dara-active', 'saku-saku-active');
+        });
+    </script>
+
+</body>
 </html>
