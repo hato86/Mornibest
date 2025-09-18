@@ -106,14 +106,13 @@
             visibility: hidden;
             transition: opacity 0.5s, transform 0.5s;
             z-index: 200;
-            white-space: nowrap;
+            white-space: normal;
         }
 
         @media (max-width: 540px) {
             #celebration-message {
                 font-size: 1.9rem;      /* 少し大きめに */
                 padding: 20px 24px;     /* 余白を少し増やす */
-                max-width: 96%;         /* 幅を少し広げる */
                 white-space: normal;
                 word-break: break-word;
             }
@@ -234,7 +233,7 @@
             }
 
             // 4) 成功メッセージの表示
-            celebrationMessage.textContent = `${currentTaskName.textContent.replace('中', '')} 完了！お疲れ様！✨`;
+            celebrationMessage.innerHTML = `${currentTaskName.textContent.replace('中', '')} 完了！お疲れ様！✨`;
             celebrationMessage.classList.add('show');
             setTimeout(() => {
                 celebrationMessage.classList.remove('show');
