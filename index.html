@@ -18,7 +18,7 @@
         /* 画面の基本レイアウト */
         .screen {
             width: 100%;
-            min-height: 100vh; /* 画面の高さいっぱいに広げる */
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -32,39 +32,18 @@
             max-width: 400px;
         }
         
-        h1 {
-            font-size: 2.5rem; font-weight: 300; color: #333; margin-bottom: 0.5em;
-        }
-
-        p.subtitle {
-            font-size: 1.2rem; color: #555; margin-bottom: 2em;
-        }
-
-        .button-wrapper {
-            display: flex; justify-content: center; gap: 20px;
-        }
-
+        h1 { font-size: 2.5rem; font-weight: 300; color: #333; margin-bottom: 0.5em; }
+        p.subtitle { font-size: 1.2rem; color: #555; margin-bottom: 2em; }
+        .button-wrapper { display: flex; justify-content: center; gap: 20px; }
         .mode-button {
             width: 120px; height: 120px; border: 2px solid #333; background-color: #fff; font-size: 1.1rem;
             font-weight: bold; color: #333; cursor: pointer; transition: background-color 0.2s, transform 0.2s;
             display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .mode-button:hover, .mode-button:active {
-            background-color: #e9e9e9; transform: scale(1.05);
-        }
-        
-        .count-display {
-            margin-top: 2.5em; padding: 1em; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .count-display p {
-            margin: 0.5em 0; font-size: 1.1rem; color: #333; font-weight: 500;
-        }
-
-        .count-display span {
-            font-weight: bold; font-size: 1.5em; color: #007bff; margin: 0 0.2em;
-        }
+        .mode-button:hover, .mode-button:active { background-color: #e9e9e9; transform: scale(1.05); }
+        .count-display { margin-top: 2.5em; padding: 1em; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .count-display p { margin: 0.5em 0; font-size: 1.1rem; color: #333; font-weight: 500; }
+        .count-display span { font-weight: bold; font-size: 1.5em; color: #007bff; margin: 0 0.2em; }
         
         /* --- ここから追加・変更 --- */
 
@@ -77,55 +56,54 @@
             transition: opacity 0.4s ease-in-out;
             z-index: 100;
         }
-
-        .overlay-section.active {
-            opacity: 1; visibility: visible;
-        }
+        .overlay-section.active { opacity: 1; visibility: visible; }
 
         /* タスク選択画面のスタイル */
-        #task-section h2 {
-            font-size: 2.8rem; font-weight: 500; margin-bottom: 0.2em;
-        }
-        #task-section p {
-            font-size: 1.1rem; color: #555; margin-bottom: 2em;
-        }
-
+        #task-section h2 { font-size: 2.8rem; font-weight: 500; margin-bottom: 0.2em; }
+        #task-section p { font-size: 1.1rem; color: #555; margin-bottom: 2em; }
         .task-button {
             width: 80%; max-width: 320px; padding: 18px; margin-bottom: 15px;
             border: 2px solid #333; background-color: #fff; font-size: 1.2rem;
             font-weight: bold; cursor: pointer; transition: background-color 0.2s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px;
         }
-        .task-button:hover {
-            background-color: #e9e9e9;
-        }
+        .task-button:hover { background-color: #e9e9e9; }
+        #last-task-display { position: absolute; bottom: 40px; font-size: 1.1rem; color: #333; }
+        #last-task-display span { font-weight: bold; text-decoration: underline; }
 
-        #last-task-display {
-            position: absolute; bottom: 40px; font-size: 1.1rem; color: #333;
+        /* タスク実行中画面のスタイル */
+        #in-progress-section h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1.5em;
         }
-        #last-task-display span {
-            font-weight: bold; text-decoration: underline;
+        .complete-button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745; /* 緑色 */
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
         }
+        .complete-button:hover { background-color: #218838; }
+        .complete-button:active { transform: scale(0.98); }
 
         /* メッセージ表示エリアのスタイル */
         #message-section {
             font-size: 3rem; font-weight: bold; color: #333;
             background-color: rgba(255, 255, 255, 0.95);
         }
-
-        #message-section.dara-dara-active {
-            animation: blur-in 1.5s forwards;
-        }
-
+        #message-section.dara-dara-active { animation: blur-in 1.5s forwards; }
         @keyframes blur-in {
             0% { opacity: 0; filter: blur(10px); transform: scale(0.9); }
             100% { opacity: 1; filter: blur(0); transform: scale(1); }
         }
-
-        #message-section.saku-saku-active {
-            animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-
+        #message-section.saku-saku-active { animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
         @keyframes slide-in-right {
             0% { transform: translateX(100%); opacity: 0; }
             100% { transform: translateX(0); opacity: 1; }
@@ -142,7 +120,6 @@
                 <button id="dara-dara-btn" class="mode-button">ダラダラ<br>モード</button>
                 <button id="saku-saku-btn" class="mode-button">サクサク<br>モード</button>
             </div>
-            
             <div class="count-display">
                 <p>サクサク日数は<span id="saku-saku-count">0</span>日です</p>
                 <p>ダラダラ日数は<span id="dara-dara-count">0</span>日です</p>
@@ -168,6 +145,14 @@
         <span id="message-text"></span>
     </div>
 
+    <div id="in-progress-section" class="overlay-section">
+        <div class="container">
+            <h2 id="current-task-name"></h2>
+            <button id="complete-btn" class="complete-button">完了</button>
+        </div>
+    </div>
+
+
     <script>
         // DOM要素の取得
         const daraDaraButton = document.getElementById('dara-dara-btn');
@@ -181,21 +166,23 @@
 
         const messageSection = document.getElementById('message-section');
         const messageText = document.getElementById('message-text');
+
+        const inProgressSection = document.getElementById('in-progress-section');
+        const currentTaskName = document.getElementById('current-task-name');
+        const completeBtn = document.getElementById('complete-btn');
         
+        let currentSakuTask = null; // 現在実行中のサクサクタスクを保持する変数
+
         // ページの読み込み完了時に永続データを読み込む
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPersistentData();
-        });
+        document.addEventListener('DOMContentLoaded', loadPersistentData);
 
         // localStorageから各種データを読み込む関数
         function loadPersistentData() {
-            // モード選択日数を読み込み
             const sakuSakuCount = parseInt(localStorage.getItem('sakuSakuCount')) || 0;
             const daraDaraCount = parseInt(localStorage.getItem('daraDaraCount')) || 0;
             sakuSakuCountSpan.textContent = sakuSakuCount;
             daraDaraCountSpan.textContent = daraDaraCount;
 
-            // 前回選択したタスクを読み込み
             const lastTask = localStorage.getItem('lastSakuSakuTask') || 'なし';
             lastTaskSpan.textContent = lastTask;
         }
@@ -206,68 +193,72 @@
             let currentCount = parseInt(localStorage.getItem(key)) || 0;
             currentCount++;
             localStorage.setItem(key, currentCount);
-            loadPersistentData(); // 画面表示をまとめて更新
+            loadPersistentData();
         }
         
         // --- イベントリスナー ---
 
-        // ダラダラモードボタン
         daraDaraButton.addEventListener('click', () => {
             updateCount('dara-dara');
             showMessage('ごゆっくりどうぞ〜', 'dara-dara');
         });
 
-        // サクサクモードボタン
         sakuSakuButton.addEventListener('click', () => {
             updateCount('saku-saku');
-            // メッセージ表示の代わりにタスク選択画面を表示
             taskSection.classList.add('active');
         });
 
-        // タスク選択ボタン（イベント移譲を利用）
         taskButtonsWrapper.addEventListener('click', (event) => {
-            // クリックされたのがtask-buttonクラスを持つ要素でなければ処理を中断
             if (!event.target.classList.contains('task-button')) return;
             
             const selectedTask = event.target.dataset.task;
-            
-            // 今回選択したタスクをlocalStorageに保存
+            currentSakuTask = selectedTask; // 選択されたタスクを変数に保持
             localStorage.setItem('lastSakuSakuTask', selectedTask);
-
-            // タスク画面を非表示にする
             taskSection.classList.remove('active');
 
-            // 0.4秒（タスク画面が消えるアニメーション時間）待ってからメッセージを表示
             setTimeout(() => {
                 showMessage('頑張ろう！', 'saku-saku');
             }, 400);
         });
 
-        // メッセージ表示画面（クリックで非表示）
-        messageSection.addEventListener('click', () => {
-            hideMessage();
-        });
+        messageSection.addEventListener('click', handleMessageDismiss);
 
+        completeBtn.addEventListener('click', () => {
+            inProgressSection.classList.remove('active');
+            currentSakuTask = null; // タスク完了でリセット
+        });
 
         // --- 表示/非表示を制御する関数 ---
         
         function showMessage(text, mode) {
             messageSection.classList.remove('dara-dara-active', 'saku-saku-active');
             messageText.textContent = text;
+            messageSection.dataset.currentMode = mode; // モードをdata属性に保存
             messageSection.classList.add('active');
 
             const animationClass = mode === 'dara-dara' ? 'dara-dara-active' : 'saku-saku-active';
             messageSection.classList.add(animationClass);
 
-            setTimeout(() => {
-                hideMessage();
-            }, 3000); // 3秒後に自動で非表示
+            setTimeout(handleMessageDismiss, 3000);
         }
 
-        function hideMessage() {
+        function handleMessageDismiss() {
+            if (!messageSection.classList.contains('active')) return; // 既に非表示なら何もしない
+
+            const mode = messageSection.dataset.currentMode;
             messageSection.classList.remove('active', 'dara-dara-active', 'saku-saku-active');
-            // メッセージが消えたら、次回のタスク表示のために前回タスクを更新しておく
             loadPersistentData();
+
+            // サクサクモードの場合のみ、次の画面へ進む
+            if (mode === 'saku-saku') {
+                showInProgressScreen();
+            }
+        }
+
+        function showInProgressScreen() {
+            if (!currentSakuTask) return; // タスクがなければ何もしない
+            currentTaskName.textContent = `${currentSakuTask}中`;
+            inProgressSection.classList.add('active');
         }
 
     </script>
