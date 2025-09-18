@@ -109,10 +109,13 @@
             white-space: nowrap;
         }
 
-         @media (max-width: 480px) {
+              @media (max-width: 480px) {
             #celebration-message {
-                font-size: 1.2rem;
-                padding: 18px;
+                font-size: 1.1rem;      /* 文字を小さくする */
+                padding: 12px 16px;     /* 余白を小さくする */
+                max-width: 90%;         /* 横幅を画面内に収める */
+                white-space: normal;    /* 自動改行を許可する */
+                word-break: break-word; /* 日本語の長い語も折り返す */
             }
         }
 
