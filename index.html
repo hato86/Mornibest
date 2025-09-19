@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mornibest</title>
+    <title>Morni best</title>
     <style>
         /* CSS: ページ全体のスタイルを設定 */
         html, body {
@@ -212,15 +212,15 @@
             border: 10px solid #ffeb3b;
             border-radius: 50%;
             box-sizing: border-box;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* 円全体をクリップ */
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
             transform-origin: center;
-            transform: rotate(-135deg); /* 開始位置を調整 */
+            transform: rotate(-135deg);
             animation: countdown 3s linear forwards;
         }
         
         @keyframes countdown {
             0% { transform: rotate(-135deg); }
-            100% { transform: rotate(225deg); } /* 225deg は -135deg + 360deg */
+            100% { transform: rotate(225deg); }
         }
 
         .timer-number {
@@ -230,22 +230,21 @@
             color: #333;
             z-index: 1;
         }
-        /* --- 変更点ここまで --- */
     </style>
 </head>
 <body>
 
     <div id="main-screen" class="screen">
         <div class="container">
-            <h1>Mornibest</h1>
+            <h1>Morni best</h1>
             <p class="subtitle">どっちのモードですごす？</p>
             <div class="button-wrapper">
                 <button id="dara-dara-btn" class="mode-button">ダラダラ<br>モード</button>
                 <button id="saku-saku-btn" class="mode-button">サクサク<br>モード</button>
             </div>
             <div class="count-display">
-                <p>今までのサクサク日数は<span id="saku-saku-count">0</span>日です</p>
-                <p>今までのダラダラ日数は<span id="dara-dara-count">0</span>日です</p>
+                <p>サクサク日数は<span id="saku-saku-count">0</span>日です</p>
+                <p>ダラダラ日数は<span id="dara-dara-count">0</span>日です</p>
             </div>
         </div>
     </div>
@@ -324,6 +323,17 @@
         const timerNumber = document.getElementById('timer-number');
         
         let currentSakuTask = null;
+
+        // ランダムメッセージの配列
+        const sakuSakuMessages = [
+            '頑張ろう！',
+            'レッツゴー！',
+            'いっけーーー！',
+            '今日できることを全力でやろう！',
+            '良い朝を！',
+            'カフェイン摂取は起床30分後がベスト',
+            '朝日を浴びると目が覚めやすいよ'
+        ];
 
         // ダラダラ連続カウント用の一時的なストレージ
         function getDaraDaraStreak() {
@@ -431,7 +441,6 @@
             currentSakuTask = selectedTask;
             localStorage.setItem('lastSakuSakuTask', selectedTask);
             taskSection.classList.remove('active');
-            // カウントダウン画面に遷移
             setTimeout(() => { showCountdown(); }, 400);
         });
 
@@ -453,7 +462,6 @@
             messageSection.classList.add('active');
             const animationClass = mode === 'dara-dara' ? 'dara-dara-active' : 'saku-saku-active';
             messageSection.classList.add(animationClass);
-            // カウントダウンタイマーの後続処理をここで待たせる
             if (mode !== 'saku-saku') {
                 setTimeout(handleMessageDismiss, 3000);
             }
@@ -478,7 +486,7 @@
         function showDaraDaraWarning(streak) {
             if (streak >= 5) {
                 daraDaraWarningTitle.textContent = '警告';
-                daraDaraWarningText.textContent = `ダラダラモードが${streak}日続いていますが、本当にいいですか？`;
+                daraDaraWarningText.textContent = `ダラダラモードが${streak}日以上続いていますが、本当にいいですか？`;
             } else {
                 daraDaraWarningTitle.textContent = '';
                 daraDaraWarningText.textContent = '本当に今回もダラダラしますか？';
@@ -486,12 +494,11 @@
             daraDaraWarningSection.classList.add('active');
         }
 
-        // --- 新しいカウントダウン関数 ---
+        // --- カウントダウン関数 ---
         function showCountdown() {
             timerSection.classList.add('active');
             timerNumber.textContent = '3';
             
-            // アニメーションをリセットして再開
             timerGaugeFill.style.animation = 'none';
             void timerGaugeFill.offsetWidth;
             timerGaugeFill.style.animation = 'countdown 3s linear forwards';
@@ -499,13 +506,14 @@
             let count = 3;
             const countdownInterval = setInterval(() => {
                 count--;
-                timerNumber.textContent = count;
-                
-                if (count <= 0) {
+                if (count > 0) {
+                    timerNumber.textContent = count;
+                } else {
                     clearInterval(countdownInterval);
                     timerSection.classList.remove('active');
-                    // 既存の「頑張ろう！」メッセージを表示
-                    showMessage('頑張ろう！', 'saku-saku');
+                    // ランダムにメッセージを選択して表示
+                    const randomMessage = sakuSakuMessages[Math.floor(Math.random() * sakuSakuMessages.length)];
+                    showMessage(randomMessage, 'saku-saku');
                 }
             }, 1000);
         }
