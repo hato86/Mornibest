@@ -106,16 +106,16 @@
             visibility: hidden;
             transition: opacity 0.5s, transform 0.5s;
             z-index: 200;
-            white-space: nowrap;
+            white-space: normal;
         }
 
-              @media (max-width: 480px) {
+        @media (max-width: 480px) {
             #celebration-message {
-                font-size: 1.1rem;      /* 文字を小さくする */
-                padding: 12px 16px;     /* 余白を小さくする */
-                max-width: 100%;         /* 横幅を画面内に収める */
-                white-space: normal;    /* 自動改行を許可する */
-                word-break: break-word; /* 日本語の長い語も折り返す */
+                font-size: 1.1rem;
+                padding: 12px 16px;
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-word;
             }
         }
 
@@ -139,6 +139,46 @@
             0% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
             50% { box-shadow: 0 0 20px 5px #fff, 0 0 30px 10px #28a745, 0 0 40px 15px #28a745; }
             100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        }
+        
+        /* 連続ダラダラモード警告画面のスタイル */
+        #dara-dara-warning-section {
+            background-color: #f8f8f8;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        #dara-dara-warning-section .container {
+            border: 2px solid #ccc;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        #dara-dara-warning-section h2 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #d9534f; /* 警告色 */
+            margin-bottom: 0.5em;
+        }
+
+        #dara-dara-warning-section p {
+            font-size: 1.4rem;
+            color: #333;
+            line-height: 1.5;
+            margin-bottom: 2em;
+        }
+
+        #dara-dara-warning-section .button-wrapper {
+            justify-content: space-around;
+        }
+
+        #yes-btn, #no-btn {
+            border: 2px solid #333;
+            font-size: 1.2rem;
+            width: 100px;
+            height: 60px;
         }
         /* --- 変更点ここまで --- */
     </style>
@@ -186,6 +226,16 @@
         </div>
     </div>
 
+    <div id="dara-dara-warning-section" class="overlay-section">
+        <div class="container">
+            <h2 id="dara-dara-warning-title"></h2>
+            <p id="dara-dara-warning-text"></p>
+            <div class="button-wrapper">
+                <button id="yes-btn" class="mode-button">Yes</button>
+                <button id="no-btn" class="mode-button">No</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // DOM要素の取得
@@ -202,10 +252,34 @@
         const currentTaskName = document.getElementById('current-task-name');
         const completeBtn = document.getElementById('complete-btn');
         
-        // 変更点ここから
         const celebrationMessage = document.getElementById('celebration-message');
-        // 成功音を事前に読み込んでおく（ユーザー操作がないと再生できないため）
         const successAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAJABAAgAABkYXRhAAoAAPgQAP+/AAA=');
+
+        // 新しい要素の取得
+        const daraDaraWarningSection = document.getElementById('dara-dara-warning-section');
+        const daraDaraWarningTitle = document.getElementById('dara-dara-warning-title');
+        const daraDaraWarningText = document.getElementById('dara-dara-warning-text');
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        
+        let currentSakuTask = null;
+
+        // ダラダラ連続カウント用の一時的なストレージ
+        // sessionStorageはブラウザを閉じるとリセットされる
+        function getDaraDaraStreak() {
+            return parseInt(sessionStorage.getItem('daraDaraStreak')) || 0;
+        }
+
+        function setDaraDaraStreak(count) {
+            sessionStorage.setItem('daraDaraStreak', count);
+        }
+
+        function resetDaraDaraStreak() {
+            sessionStorage.setItem('daraDaraStreak', 0);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPersistentData);
+
         // 完了ボタンが押された時のお祝いエフェクト
         function celebrate() {
             // 1) 完了ボタンを光らせる
@@ -234,7 +308,7 @@
             }
 
             // 4) 成功メッセージの表示
-            celebrationMessage.textContent = `${currentTaskName.textContent.replace('中', '')} 完了！お疲れ様！✨`;
+            celebrationMessage.innerHTML = `${currentTaskName.textContent.replace('中', '')} 完了！お疲れ様！✨`;
             celebrationMessage.classList.add('show');
             setTimeout(() => {
                 celebrationMessage.classList.remove('show');
@@ -247,8 +321,6 @@
                 completeBtn.classList.remove('shining');
             }, 1200);
         }
-        // 変更点ここまで
-
 
         function loadPersistentData() {
             const sakuSakuCount = parseInt(localStorage.getItem('sakuSakuCount')) || 0;
@@ -269,13 +341,36 @@
         
         // --- イベントリスナー ---
         daraDaraButton.addEventListener('click', () => {
-            updateCount('dara-dara');
-            showMessage('ごゆっくりどうぞ〜', 'dara-dara');
+            let streakCount = getDaraDaraStreak();
+            streakCount++;
+            setDaraDaraStreak(streakCount);
+
+            if (streakCount >= 3) {
+                showDaraDaraWarning(streakCount);
+            } else {
+                updateCount('dara-dara');
+                showMessage('ごゆっくりどうぞ〜', 'dara-dara');
+            }
         });
 
         sakuSakuButton.addEventListener('click', () => {
             updateCount('saku-saku');
+            resetDaraDaraStreak(); // サクサクモードが押されたらリセット
             taskSection.classList.add('active');
+        });
+
+        // --- 新しいイベントリスナーの追加 ---
+        yesBtn.addEventListener('click', () => {
+            daraDaraWarningSection.classList.remove('active');
+            updateCount('dara-dara');
+            showMessage('ごゆっくりどうぞ〜', 'dara-dara');
+        });
+
+        noBtn.addEventListener('click', () => {
+            daraDaraWarningSection.classList.remove('active');
+            resetDaraDaraStreak(); // ダラダラをやめたので連続カウントをリセット
+            // サクサクモードに誘導するメッセージ
+            showMessage('偉い！気分を変えよう！', 'dara-dara');
         });
 
         taskButtonsWrapper.addEventListener('click', (event) => {
@@ -289,7 +384,6 @@
 
         messageSection.addEventListener('click', handleMessageDismiss);
 
-        // --- 変更点ここから ---
         completeBtn.addEventListener('click', () => {
             celebrate(); // ★お祝いエフェクトを呼び出す
             // エフェクト終了後に画面を切り替え
@@ -298,7 +392,6 @@
                 currentSakuTask = null;
             }, 1500); // 1.5秒待って画面を閉じる
         });
-        // --- 変更点ここまで ---
 
         // --- 表示/非表示を制御する関数 ---
         function showMessage(text, mode) {
@@ -325,6 +418,18 @@
             if (!currentSakuTask) return;
             currentTaskName.textContent = `${currentSakuTask}中`;
             inProgressSection.classList.add('active');
+        }
+
+        // 連続ダラダラモードの警告表示関数
+        function showDaraDaraWarning(streak) {
+            if (streak >= 5) {
+                daraDaraWarningTitle.textContent = '警告';
+                daraDaraWarningText.textContent = `ダラダラモードが${streak}日以上続いていますが、本当にいいですか？`;
+            } else { // 3 or 4
+                daraDaraWarningTitle.textContent = ''; // 画像に「警告」がないため
+                daraDaraWarningText.textContent = '本当に今回もダラダラしますか？';
+            }
+            daraDaraWarningSection.classList.add('active');
         }
     </script>
 </body>
