@@ -105,23 +105,13 @@
 
         /* 成功メッセージポップアップのスタイル */
         #celebration-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 30px;
-            background: linear-gradient(135deg, #ffeb3b, #ff9800);
-            color: white;
-            border-radius: 20px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s, transform 0.5s;
-            z-index: 200;
-            white-space: nowrap;
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px 40px; background: linear-gradient(135deg, #ffeb3b, #ff9800);
+            color: white; border-radius: 15px; font-size: 1.5rem; font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s, transform 0.5s; z-index: 200; white-space: nowrap;
         }
 
         @media (max-width: 480px) {
@@ -174,79 +164,30 @@
             padding: 10px 20px;
             font-size: 1rem;
             font-weight: bold;
-            color: #d9534f;
-            margin-bottom: 0.5em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        #set-alarm-btn { background-color: #007bff; color: white; }
+        #clear-alarm-btn { background-color: #dc3545; color: white; }
+        #alarm-status { margin-top: 20px; font-weight: bold; color: #444; }
+
+        #alarm-ringing-section { background-color: rgba(0,0,0,0.5); z-index: 999; }
+        #alarm-ringing-section .container {
+            animation: pulse 1.5s infinite;
+        }
+        #stop-alarm-btn {
+            padding: 20px 40px; font-size: 1.5rem; background-color: #ffc107; border:none;
+            color: #333; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        #dara-dara-warning-section p {
-            font-size: 1.4rem;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 2em;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
-        #dara-dara-warning-section .button-wrapper {
-            justify-content: space-around;
-        }
-
-        #yes-btn, #no-btn {
-            border: 2px solid #333;
-            font-size: 1.2rem;
-            width: 100px;
-            height: 60px;
-        }
-
-        /* カウントダウンタイマーのスタイル */
-        #timer-section {
-            background-color: #fff;
-        }
-
-        .timer-container {
-            position: relative;
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .timer-gauge {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 10px solid #ccc;
-            border-radius: 50%;
-            box-sizing: border-box;
-        }
-
-        #timer-gauge-fill {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 10px solid #ffeb3b;
-            border-radius: 50%;
-            box-sizing: border-box;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* 円全体をクリップ */
-            transform-origin: center;
-            transform: rotate(-135deg); /* 開始位置を調整 */
-            animation: countdown 3s linear forwards;
-        }
-        
-        @keyframes countdown {
-            0% { transform: rotate(-135deg); }
-            100% { transform: rotate(225deg); } /* 225deg は -135deg + 360deg */
-        }
-
-        .timer-number {
-            position: absolute;
-            font-size: 8rem;
-            font-weight: bold;
-            color: #333;
-            z-index: 1;
-        }
-        /* --- 変更点ここまで --- */
     </style>
 </head>
 <body>
@@ -324,14 +265,8 @@
             </div>
         </div>
     </div>
-    
-    <div id="timer-section" class="overlay-section">
-        <div class="timer-container">
-            <div class="timer-gauge"></div>
-            <div id="timer-gauge-fill"></div>
-            <span id="timer-number" class="timer-number">3</span>
-        </div>
-    </div>
+
+    <audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
 
     <script>
         // DOM要素の取得
@@ -350,24 +285,43 @@
         const currentTaskName = document.getElementById('current-task-name');
         const completeBtn = document.getElementById('complete-btn');
         const celebrationMessage = document.getElementById('celebration-message');
-        const successAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAJABAAgAABkYXRhAAoAAPgQAP+/AAA=');
-
+        const successAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==');
         const daraDaraWarningSection = document.getElementById('dara-dara-warning-section');
         const daraDaraWarningTitle = document.getElementById('dara-dara-warning-title');
         const daraDaraWarningText = document.getElementById('dara-dara-warning-text');
         const yesBtn = document.getElementById('yes-btn');
         const noBtn = document.getElementById('no-btn');
 
-        const timerSection = document.getElementById('timer-section');
-        const timerGaugeFill = document.getElementById('timer-gauge-fill');
-        const timerNumber = document.getElementById('timer-number');
+        // --- アラーム関連のDOM要素 ---
+        const alarmSection = document.getElementById('alarm-section');
+        const alarmRingingSection = document.getElementById('alarm-ringing-section');
+        const alarmTimeInput = document.getElementById('alarm-time-input');
+        const setAlarmBtn = document.getElementById('set-alarm-btn');
+        const clearAlarmBtn = document.getElementById('clear-alarm-btn');
+        const stopAlarmBtn = document.getElementById('stop-alarm-btn');
+        const alarmStatus = document.getElementById('alarm-status');
+        const alarmSound = document.getElementById('alarm-sound');
         
         // --- グローバル変数 ---
         let currentSakuTask = null;
+        let alarmTime = null;
+        let alarmCheckInterval = null;
 
-        // ダラダラ連続カウント用の一時的なストレージ
-        function getDaraDaraStreak() {
-            return parseInt(sessionStorage.getItem('daraDaraStreak')) || 0;
+        // --- 初期化処理 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPersistentData();
+            initializeAlarm();
+        });
+
+        // --- アラーム機能 ---
+        function initializeAlarm() {
+            const savedAlarmTime = localStorage.getItem('alarmTime');
+            if (savedAlarmTime) {
+                alarmTime = savedAlarmTime;
+                alarmTimeInput.value = alarmTime;
+                alarmStatus.textContent = `アラーム設定中: ${alarmTime}`;
+                startAlarmChecker();
+            }
         }
 
         function startAlarmChecker() {
@@ -384,16 +338,57 @@
             }, 1000); // 1秒ごとにチェック
         }
 
-        function resetDaraDaraStreak() {
-            sessionStorage.setItem('daraDaraStreak', 0);
+        function triggerAlarm() {
+            clearInterval(alarmCheckInterval);
+            alarmSound.play().catch(e => console.error("音声の再生に失敗しました:", e));
+
+            // 全ての画面を非表示にしてからアラーム画面を表示
+            allScreens.forEach(el => el.classList.remove('active'));
+            alarmRingingSection.classList.add('active');
         }
 
-        document.addEventListener('DOMContentLoaded', loadPersistentData);
+        setAlarmBtn.addEventListener('click', () => {
+            if (alarmTimeInput.value) {
+                alarmTime = alarmTimeInput.value;
+                localStorage.setItem('alarmTime', alarmTime);
+                alarmStatus.textContent = `アラーム設定中: ${alarmTime}`;
+                startAlarmChecker();
+                alert(`${alarmTime} にアラームを設定しました。`);
+            } else {
+                alert('時間を設定してください。');
+            }
+        });
 
+        clearAlarmBtn.addEventListener('click', () => {
+            alarmTime = null;
+            localStorage.removeItem('alarmTime');
+            alarmStatus.textContent = 'アラームは設定されていません';
+            if (alarmCheckInterval) {
+                clearInterval(alarmCheckInterval);
+            }
+            alert('アラームを解除しました。');
+        });
+
+        stopAlarmBtn.addEventListener('click', () => {
+            alarmSound.pause();
+            alarmSound.currentTime = 0;
+            alarmTime = null; // アラームを一度リセット
+            localStorage.removeItem('alarmTime');
+            
+            // アラーム画面を非表示にし、メイン画面を表示
+            alarmRingingSection.classList.remove('active');
+            mainScreen.classList.add('active');
+        });
+
+        // --- ダラダラモード連続カウント ---
+        function getDaraDaraStreak() { return parseInt(sessionStorage.getItem('daraDaraStreak')) || 0; }
+        function setDaraDaraStreak(count) { sessionStorage.setItem('daraDaraStreak', count); }
+        function resetDaraDaraStreak() { sessionStorage.setItem('daraDaraStreak', 0); }
+
+        // --- お祝いエフェクト ---
         function celebrate() {
             // 1) 完了ボタンを光らせる
             completeBtn.classList.add('shining');
-            
             const confettiCount = 30;
             for (let i = 0; i < confettiCount; i++) {
                 const confetti = document.createElement('div');
@@ -410,17 +405,10 @@
                 document.body.appendChild(confetti);
                 setTimeout(() => confetti.remove(), 2500);
             }
-
-            if ('vibrate' in navigator) {
-                navigator.vibrate([100, 50, 100]);
-            }
-
+            if ('vibrate' in navigator) { navigator.vibrate([100, 50, 100]); }
             celebrationMessage.textContent = `${currentTaskName.textContent.replace('中', '')} 完了！お疲れ様！✨`;
             celebrationMessage.classList.add('show');
-            setTimeout(() => {
-                celebrationMessage.classList.remove('show');
-            }, 2000);
-
+            setTimeout(() => { celebrationMessage.classList.remove('show'); }, 2000);
             successAudio.play().catch(()=>{});
             setTimeout(() => { completeBtn.classList.remove('shining'); }, 1200);
         }
@@ -458,7 +446,8 @@
         sakuSakuButton.addEventListener('click', () => {
             updateCount('saku-saku');
             resetDaraDaraStreak();
-            taskSection.classList.add('active');
+            mainScreen.classList.remove('active'); // メイン画面を非表示に
+            taskSection.classList.add('active'); // タスク選択画面を表示
         });
 
         // --- 新しいイベントリスナーの追加 ---
@@ -539,29 +528,29 @@
             daraDaraWarningSection.classList.add('active');
         }
 
-        // --- 新しいカウントダウン関数 ---
-        function showCountdown() {
-            timerSection.classList.add('active');
-            timerNumber.textContent = '3';
-            
-            // アニメーションをリセットして再開
-            timerGaugeFill.style.animation = 'none';
-            void timerGaugeFill.offsetWidth;
-            timerGaugeFill.style.animation = 'countdown 3s linear forwards';
+        // 警告画面のNoボタンでメイン画面に戻る処理を追加
+        noBtn.addEventListener('click', () => {
+            daraDaraWarningSection.classList.remove('active');
+            resetDaraDaraStreak();
+            // メッセージ表示ではなく直接メイン画面に戻るように変更
+            mainScreen.classList.add('active');
+        });
 
-            let count = 3;
-            const countdownInterval = setInterval(() => {
-                count--;
-                timerNumber.textContent = count;
-                
-                if (count <= 0) {
-                    clearInterval(countdownInterval);
-                    timerSection.classList.remove('active');
-                    // 既存の「頑張ろう！」メッセージを表示
-                    showMessage('頑張ろう！', 'saku-saku');
-                }
-            }, 1000);
+        // ダラダラモードのメッセージが消えた後、メイン画面に戻るように修正
+        function handleMessageDismiss() {
+            if (!messageSection.classList.contains('active')) return;
+            const mode = messageSection.dataset.currentMode;
+            messageSection.classList.remove('active', 'dara-dara-active', 'saku-saku-active');
+            loadPersistentData();
+            if (mode === 'saku-saku') {
+                showInProgressScreen();
+            } else {
+                // ダラダラモードの後、メイン画面に確実に戻す
+                allScreens.forEach(el => el.classList.remove('active'));
+                mainScreen.classList.add('active');
+            }
         }
+
     </script>
 </body>
 </html>
