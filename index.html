@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morni best</title>
+    <title>Mornibest</title>
     <style>
         /* CSS: ページ全体のスタイルを設定 */
         html, body {
@@ -187,6 +187,57 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        
+        /* --- カウントダウンタイマーのスタイル --- */
+        #timer-section {
+            background-color: #fff;
+            z-index: 1000; /* 最前面に表示 */
+        }
+
+        .timer-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .timer-gauge {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 10px solid #ccc;
+            border-radius: 50%;
+            box-sizing: border-box;
+        }
+
+        #timer-gauge-fill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 10px solid #ffeb3b;
+            border-radius: 50%;
+            box-sizing: border-box;
+            transform-origin: center;
+            transform: rotate(-135deg); /* 開始位置 */
+            animation: countdown 3s linear forwards;
+        }
+        
+        @keyframes countdown {
+            0% { transform: rotate(-135deg); }
+            100% { transform: rotate(225deg); } /* 反時計回りに360度回転して元の位置に戻る（見た目はゲージがなくなる） */
+        }
+
+        .timer-number {
+            position: absolute;
+            font-size: 8rem;
+            font-weight: bold;
+            color: #333;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
@@ -206,15 +257,15 @@
 
     <div id="main-screen" class="screen">
         <div class="container">
-            <h1>Morni best</h1>
+            <h1>Mornibest</h1>
             <p class="subtitle">どっちのモードですごす？</p>
             <div class="button-wrapper">
                 <button id="dara-dara-btn" class="mode-button">ダラダラ<br>モード</button>
                 <button id="saku-saku-btn" class="mode-button">サクサク<br>モード</button>
             </div>
             <div class="count-display">
-                <p>サクサク日数は<span id="saku-saku-count">0</span>日です</p>
-                <p>ダラダラ日数は<span id="dara-dara-count">0</span>日です</p>
+                <p>今までのサクサク日数は<span id="saku-saku-count">0</span>日です</p>
+                <p>今までのダラダラ日数は<span id="dara-dara-count">0</span>日です</p>
             </div>
         </div>
     </div>
@@ -265,6 +316,14 @@
         </div>
     </div>
 
+    <div id="timer-section" class="overlay-section">
+        <div class="timer-container">
+            <div class="timer-gauge"></div>
+            <div id="timer-gauge-fill"></div>
+            <span id="timer-number" class="timer-number">3</span>
+        </div>
+    </div>
+
     <audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
 
     <script>
@@ -291,7 +350,7 @@
         const yesBtn = document.getElementById('yes-btn');
         const noBtn = document.getElementById('no-btn');
 
-        // --- アラーム関連のDOM要素 ---
+        // アラーム関連のDOM要素
         const alarmSection = document.getElementById('alarm-section');
         const alarmRingingSection = document.getElementById('alarm-ringing-section');
         const alarmTimeInput = document.getElementById('alarm-time-input');
@@ -301,18 +360,37 @@
         const alarmStatus = document.getElementById('alarm-status');
         const alarmSound = document.getElementById('alarm-sound');
         
-        // --- グローバル変数 ---
+        // 新しいタイマー関連のDOM要素
+        const timerSection = document.getElementById('timer-section');
+        const timerGaugeFill = document.getElementById('timer-gauge-fill');
+        const timerNumber = document.getElementById('timer-number');
+
+        // グローバル変数
         let currentSakuTask = null;
         let alarmTime = null;
         let alarmCheckInterval = null;
 
-        // --- 初期化処理 ---
+        // ランダムメッセージの配列
+        const sakuSakuMessages = [
+            '頑張ろう！',
+            'さあ、始めよう！',
+            'レッツゴー！',
+            '今日できることを全力でやろう！',
+            '良い1日を！',
+            'やりますねぇ！',
+            'いってらっしゃい！',
+            'ファイト！',
+            'カフェイン摂取は起床30分後がベスト',
+            '朝日を浴びると目が覚めやすいよ'
+        ];
+
+        // 初期化処理
         document.addEventListener('DOMContentLoaded', () => {
             loadPersistentData();
             initializeAlarm();
         });
 
-        // --- アラーム機能 ---
+        // アラーム機能
         function initializeAlarm() {
             const savedAlarmTime = localStorage.getItem('alarmTime');
             if (savedAlarmTime) {
@@ -341,7 +419,6 @@
             clearInterval(alarmCheckInterval);
             alarmSound.play().catch(e => console.error("音声の再生に失敗しました:", e));
 
-            // 全ての画面を非表示にしてからアラーム画面を表示
             allScreens.forEach(el => el.classList.remove('active'));
             alarmRingingSection.classList.add('active');
         }
@@ -374,17 +451,16 @@
             alarmTime = null; // アラームを一度リセット
             localStorage.removeItem('alarmTime');
             
-            // アラーム画面を非表示にし、メイン画面を表示
             alarmRingingSection.classList.remove('active');
             mainScreen.classList.add('active');
         });
 
-        // --- ダラダラモード連続カウント ---
+        // ダラダラモード連続カウント
         function getDaraDaraStreak() { return parseInt(sessionStorage.getItem('daraDaraStreak')) || 0; }
         function setDaraDaraStreak(count) { sessionStorage.setItem('daraDaraStreak', count); }
         function resetDaraDaraStreak() { sessionStorage.setItem('daraDaraStreak', 0); }
 
-        // --- お祝いエフェクト ---
+        // お祝いエフェクト
         function celebrate() {
             completeBtn.classList.add('shining');
             const confettiCount = 30;
@@ -428,7 +504,7 @@
             loadPersistentData();
         }
         
-        // --- モード選択ボタンのイベントリスナー ---
+        // モード選択ボタンのイベントリスナー
         daraDaraButton.addEventListener('click', () => {
             let streakCount = getDaraDaraStreak();
             streakCount++;
@@ -444,8 +520,8 @@
         sakuSakuButton.addEventListener('click', () => {
             updateCount('saku-saku');
             resetDaraDaraStreak();
-            mainScreen.classList.remove('active'); // メイン画面を非表示に
-            taskSection.classList.add('active'); // タスク選択画面を表示
+            mainScreen.classList.remove('active');
+            taskSection.classList.add('active');
         });
 
         yesBtn.addEventListener('click', () => {
@@ -475,12 +551,12 @@
             celebrate();
             setTimeout(() => {
                 inProgressSection.classList.remove('active');
-                mainScreen.classList.add('active'); // タスク完了後、メイン画面に戻る
+                mainScreen.classList.add('active');
                 currentSakuTask = null;
             }, 1500);
         });
 
-        // --- 画面表示制御 ---
+        // 画面表示制御
         function showMessage(text, mode) {
             messageSection.classList.remove('dara-dara-active', 'saku-saku-active');
             messageText.textContent = text;
@@ -501,7 +577,7 @@
             if (mode === 'saku-saku') {
                 showInProgressScreen();
             } else {
-                // ダラダラモードのメッセージが消えたらメイン画面に戻る
+                allScreens.forEach(el => el.classList.remove('active'));
                 mainScreen.classList.add('active');
             }
         }
@@ -513,7 +589,7 @@
         }
 
         function showDaraDaraWarning(streak) {
-            mainScreen.classList.remove('active'); // 警告表示中はメイン画面を隠す
+            mainScreen.classList.remove('active');
             if (streak >= 5) {
                 daraDaraWarningTitle.textContent = '警告';
                 daraDaraWarningText.textContent = `ダラダラモードが${streak}日以上続いていますが、本当にいいですか？`;
@@ -524,29 +600,29 @@
             daraDaraWarningSection.classList.add('active');
         }
 
-        // 警告画面のNoボタンでメイン画面に戻る処理を追加
-        noBtn.addEventListener('click', () => {
-            daraDaraWarningSection.classList.remove('active');
-            resetDaraDaraStreak();
-            // メッセージ表示ではなく直接メイン画面に戻るように変更
-            mainScreen.classList.add('active');
-        });
-
-        // ダラダラモードのメッセージが消えた後、メイン画面に戻るように修正
-        function handleMessageDismiss() {
-            if (!messageSection.classList.contains('active')) return;
-            const mode = messageSection.dataset.currentMode;
-            messageSection.classList.remove('active', 'dara-dara-active', 'saku-saku-active');
-            loadPersistentData();
-            if (mode === 'saku-saku') {
-                showInProgressScreen();
-            } else {
-                // ダラダラモードの後、メイン画面に確実に戻す
-                allScreens.forEach(el => el.classList.remove('active'));
-                mainScreen.classList.add('active');
-            }
+        // カウントダウン機能
+        function showCountdown() {
+            allScreens.forEach(el => el.classList.remove('active'));
+            timerSection.classList.add('active');
+            
+            timerGaugeFill.style.animation = 'none';
+            void timerGaugeFill.offsetWidth;
+            timerGaugeFill.style.animation = 'countdown 3s linear forwards';
+            
+            let count = 3;
+            timerNumber.textContent = count;
+            const countdownInterval = setInterval(() => {
+                count--;
+                timerNumber.textContent = count;
+                
+                if (count <= 0) {
+                    clearInterval(countdownInterval);
+                    timerSection.classList.remove('active');
+                    const randomMessage = sakuSakuMessages[Math.floor(Math.random() * sakuSakuMessages.length)];
+                    showMessage(randomMessage, 'saku-saku');
+                }
+            }, 1000);
         }
-
     </script>
 </body>
 </html>
